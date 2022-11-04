@@ -1,0 +1,24 @@
+version: '3.6'
+
+services:
+  akhq:
+    # build:
+    #   context: .
+    image: tchiotludo/akhq
+    environment:
+      AKHQ_CONFIGURATION: |
+        akhq:
+          connections:
+            openshift-streams-kafka:
+              properties:
+                bootstrap.servers: "${BOOTSTRAP_SERVER}"
+                security.protocol: SASL_SSL
+                sasl.mechanism: OAUTHBEARER
+                sasl.jaas.config: >
+                  org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule required 
+                    oauth.client.id="${CLIENT_ID}" 
+                    oauth.client.secret="${CLIENT_SECRET}" 
+                    oauth.token.endpoint.uri="${OAUTH_TOKEN_ENDPOINT_URI}" ;
+                sasl.login.callback.handler.class: io.strimzi.kafka.oauth.client.JaasClientOauthLoginCallbackHandler
+    ports:
+      - 8080:8080
